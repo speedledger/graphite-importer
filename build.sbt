@@ -28,7 +28,6 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %% "akka-slf4j"    % akkaV,
     "org.json4s"          %% "json4s-native" % json4sV,
     "com.typesafe"        %  "config"        % "1.2.0",
-    "commons-codec"       %  "commons-codec" % "1.9",
     "ch.qos.logback"      %  "logback-classic" % "1.1.1",
     "com.github.nscala-time" %% "nscala-time" % "0.8.0"
   )

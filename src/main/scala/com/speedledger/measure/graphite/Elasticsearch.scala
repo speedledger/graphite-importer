@@ -1,12 +1,13 @@
 package com.speedledger.measure.graphite
 
 import spray.client.pipelining._
-import spray.http.BasicHttpCredentials
 import org.json4s._
 import org.json4s.JsonAST.{JArray, JObject, JValue}
 import akka.actor.{ActorLogging, Actor}
 import com.typesafe.config.ConfigFactory
 import scala.util.{Success, Failure}
+import Utils._
+import Utils.Pipeline._
 
 object ElasticsearchActor {
 
@@ -24,17 +25,15 @@ class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
 
   val config = ConfigFactory.load().getConfig("elasticsearch")
 
-  val hostname = config.getString("hostname")
-  val username = config.getString("username")
-  val password = config.getString("password")
+  val url = config.getString("url")
+  val credentials = config.getStringOption("authorization-credentials")
 
-  val pipeline = addCredentials(BasicHttpCredentials(username, password)) ~>
-    (sendReceive ~> unmarshal[JValue])
+  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[JValue])
 
   def receive = {
     case Query(indexName, typeName, query) =>
       val originalSender = context.sender
-      pipeline(Get(s"https://$hostname/$indexName/$typeName/_search", query)) onComplete {
+      pipeline(Get(s"$url/$indexName/$typeName/_search", query)) onComplete {
         case Success(response) =>
           val hits = response \ "hits" \ "hits"
           val objects: List[JObject] = for {

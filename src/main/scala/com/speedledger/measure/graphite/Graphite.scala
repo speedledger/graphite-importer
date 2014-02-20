@@ -6,7 +6,8 @@ import akka.actor.{ActorLogging, Actor}
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.typesafe.config.ConfigFactory
 import akka.event.LoggingAdapter
-import org.apache.commons.codec.binary.Base64
+import Utils._
+import Utils.Pipeline._
 
 case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds)
 
@@ -28,12 +29,10 @@ trait HostedGraphiteHTTP {
   val config = ConfigFactory.load().getConfig("graphite")
 
   val url = config.getString("url")
-  val apiKey = config.getString("apiKey")
+  val credentials = config.getStringOption("authorization-credentials")
 
-  val apiKeyBase64 = Base64.encodeBase64String(apiKey.getBytes)
-
-  val pipeline = addHeader("Authorization", s"Basic $apiKeyBase64") ~> (sendReceive ~> unmarshal[String])
-
+  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[String])
+  
   def prepareData(measures: Seq[Measure]) = {
     measures map {
       case Measure(path, value, time) =>
