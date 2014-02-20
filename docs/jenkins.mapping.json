@@ -1,0 +1,8 @@
+{
+    "build": {
+        "_timestamp": {
+            "enabled": true,
+            "store": true
+        }
+    }
+}
