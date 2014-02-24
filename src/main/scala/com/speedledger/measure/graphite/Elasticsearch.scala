@@ -17,6 +17,9 @@ object ElasticsearchActor {
 
 }
 
+/**
+ * Actor that performs queries on Elasticsearch and returns the result to the sender.
+ */
 class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
 
   import ElasticsearchActor._

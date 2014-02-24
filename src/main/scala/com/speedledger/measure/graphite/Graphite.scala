@@ -13,7 +13,10 @@ case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds)
 
 case class Measures(measures: Seq[Measure])
 
-class GraphiteActor extends Actor with ActorLogging with HostedGraphiteHTTP {
+/**
+ * Actor that sends measurements to Graphite.
+ */
+class GraphiteActor extends Actor with ActorLogging with GraphiteHTTP {
   def receive = {
     case Measures(measures) =>
       sendMeasures(measures)
@@ -22,7 +25,10 @@ class GraphiteActor extends Actor with ActorLogging with HostedGraphiteHTTP {
   }
 }
 
-trait HostedGraphiteHTTP {
+/**
+ * HTTP implementation to communicate with Graphite.
+ */
+trait GraphiteHTTP {
   self: Actor =>
   def log: LoggingAdapter
 
