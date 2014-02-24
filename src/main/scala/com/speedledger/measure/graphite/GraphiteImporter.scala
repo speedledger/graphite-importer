@@ -9,6 +9,9 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.event.Logging
 import org.joda.time.DateTime
+import com.speedledger.measure.graphite.Utils.FileIO
+import java.io.File
+import scala.util.Try
 
 /**
  * Application that imports data into Graphite.
@@ -28,7 +31,7 @@ object GraphiteImporter extends App with JsonSupport {
   val interval = FiniteDuration(config.getDuration("updater.interval", SECONDS), SECONDS)
   log.info(s"Update interval is $interval")
 
-  system.scheduler.schedule(1 second, interval, updater, Tick)
+  system.scheduler.schedule(initialDelay = 1.second, interval, updater, Tick)
 }
 
 case object Tick
@@ -36,19 +39,22 @@ case object Tick
 case class Update(lastUpdateTime: DateTime)
 
 class UpdaterActor extends Actor {
-  val config = ConfigFactory.load().getConfig("updater.jenkins")
+  val config = ConfigFactory.load().getConfig("updater")
 
   val jenkins = context.actorOf(Props[JenkinsActor], "jenkins")
 
-  var lastTime = new DateTime(0)
-
+  val timeFile = new File(config.getString("timeFile"))
+  var lastTime =
+    Try(FileIO.read(timeFile).toLong).map(new DateTime(_))
+      .getOrElse(new DateTime(0))
 
   def receive = {
     case Tick =>
-      if (config.getBoolean("enabled"))
+      if (config.getBoolean("jenkins.enabled"))
         jenkins ! Update(lastTime)
 
       lastTime = DateTime.now
+      FileIO.write(lastTime.getMillis.toString, timeFile)
   }
 }
 

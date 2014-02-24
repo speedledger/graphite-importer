@@ -4,6 +4,8 @@ import spray.client.pipelining._
 import spray.http.{HttpRequest, GenericHttpCredentials}
 import org.parboiled.common.{Base64 => ParboiledBase64}
 import com.typesafe.config.Config
+import java.io.{PrintWriter, File}
+import scala.io.Source
 
 object Utils {
 
@@ -29,6 +31,16 @@ object Utils {
         credentials =>
           addCredentials(GenericHttpCredentials("Basic", credentials.base64))
       } getOrElse identity
+    }
+  }
+
+  object FileIO {
+    def read(file: File) = Source.fromFile(file).getLines().mkString("\n")
+
+    def write(data: String, file: File) {
+      val writer = new PrintWriter(file)
+      writer.write(data)
+      writer.close()
     }
   }
 
