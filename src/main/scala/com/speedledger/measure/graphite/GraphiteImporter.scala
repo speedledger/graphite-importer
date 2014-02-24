@@ -43,7 +43,7 @@ class UpdaterActor extends Actor {
 
   val jenkins = context.actorOf(Props[JenkinsActor], "jenkins")
 
-  val timeFile = new File(config.getString("timeFile"))
+  val timeFile = new File(config.getString("last-updated-time-file"))
   var lastTime =
     Try(FileIO.read(timeFile).toLong).map(new DateTime(_))
       .getOrElse(new DateTime(0))
