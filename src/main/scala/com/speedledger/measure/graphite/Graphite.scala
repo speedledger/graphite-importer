@@ -9,7 +9,11 @@ import akka.event.LoggingAdapter
 import Utils._
 import Utils.Pipeline._
 
-case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds)
+case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds) {
+  def cleanPath = path.map(_.replaceAll("[\\(\\)]", "").replaceAll("[ \\.]", "_"))
+
+  def dotPath = cleanPath.mkString(".")
+}
 
 case class Measures(measures: Seq[Measure])
 
@@ -38,14 +42,12 @@ trait GraphiteHTTP {
   val credentials = config.getStringOption("authorization-credentials")
 
   val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[String])
-  
+
   def prepareData(measures: Seq[Measure]) = {
     measures map {
-      case Measure(path, value, time) =>
-        val cleanPath = path.map(_.replaceAll("[\\(\\)]", "").replaceAll("[ \\.]", "_"))
-        val dotPath = cleanPath.mkString(".")
+      case m@Measure(_, value, time) =>
         val epochSeconds = time / 1000
-        s"$dotPath $value $epochSeconds"
+        s"${m.dotPath} $value $epochSeconds"
     } mkString "\n"
   }
 
@@ -54,7 +56,7 @@ trait GraphiteHTTP {
     log.debug("Measurement data: {}", data)
     pipeline(Post(url, data)) onComplete {
       case Failure(ex) => log.error(ex, "Error when sending data to Graphite")
-      case Success("") => log.info(s"Sent ${measures.size} measures")
+      case Success("") => log.info(s"Sent ${measures.size} measurements")
       case Success(response) => log.warning("Got unexpected response from Graphite: {}", response)
     }
   }
