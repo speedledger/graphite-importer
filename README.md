@@ -1,7 +1,10 @@
 Graphite Importer
 =================
 
-Imports data from Elasticsearch to Graphite.
+Continuously import data from Elasticsearch to Graphite.
+Its built as an Akka application to be extensible and easy to create different measurements.
+
+Currently imports Jenkins data created with [elasticsearch-jenkins](https://github.com/speedledger/elasticsearch-jenkins).
 
 Building
 --------
