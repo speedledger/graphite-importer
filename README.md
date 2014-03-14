@@ -12,9 +12,8 @@ Building
 ### Setup
 
 * [sbt](http://www.scala-sbt.org/)
-* [sbt-idea](https://github.com/mpeltonen/sbt-idea)
 
-Run `sbt gen-idea` to generate an IDEA project.
+Recommended IDE is IntelliJ IDEA (version >= 13). Simply clone the repo and open the `build.sbt` file with IntelliJ.
 
 ### Build
 

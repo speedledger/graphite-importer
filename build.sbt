@@ -10,10 +10,6 @@ scalaVersion  := "2.10.3"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
-ideaExcludeFolders += ".idea"
-
-ideaExcludeFolders += ".idea_modules"
-
 libraryDependencies ++= {
   val sprayV = "1.2.0"
   val akkaV = "2.2.3"
