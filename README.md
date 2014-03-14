@@ -22,4 +22,6 @@ Run `sbt assembly` and a fat JAR will be created in the `target/scala-2.10` fold
 Usage
 -----
 
-The fat JAR can be started with `java -jar <path to JAR file>`.
+Configure the application in a copy of [application.conf](src/main/resources/application.conf).
+
+Start the application using the fat JAR with command `java -Dconfig.file=<path to config file> -jar <path to JAR file>`.
