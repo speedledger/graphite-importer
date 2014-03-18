@@ -8,21 +8,19 @@ version       := "0.1"
 
 scalaVersion  := "2.10.3"
 
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
-
 libraryDependencies ++= {
-  val sprayV = "1.2.0"
-  val akkaV = "2.2.3"
-  val json4sV = "3.2.6"
+  val sprayVersion = "1.2.0"
+  val akkaVersion = "2.2.3"
+  val json4sVersion = "3.2.6"
   Seq(
-    "io.spray"            %  "spray-can"     % sprayV,
-    "io.spray"            %  "spray-client"  % sprayV,
-    "io.spray"            %  "spray-http"    % sprayV,
-    "io.spray"            %  "spray-httpx"   % sprayV,
-    "io.spray"            %  "spray-util"    % sprayV,
-    "com.typesafe.akka"   %% "akka-actor"    % akkaV,
-    "com.typesafe.akka"   %% "akka-slf4j"    % akkaV,
-    "org.json4s"          %% "json4s-native" % json4sV,
+    "io.spray"            %  "spray-can"     % sprayVersion,
+    "io.spray"            %  "spray-client"  % sprayVersion,
+    "io.spray"            %  "spray-http"    % sprayVersion,
+    "io.spray"            %  "spray-httpx"   % sprayVersion,
+    "io.spray"            %  "spray-util"    % sprayVersion,
+    "com.typesafe.akka"   %% "akka-actor"    % akkaVersion,
+    "com.typesafe.akka"   %% "akka-slf4j"    % akkaVersion,
+    "org.json4s"          %% "json4s-native" % json4sVersion,
     "com.typesafe"        %  "config"        % "1.2.0",
     "ch.qos.logback"      %  "logback-classic" % "1.1.1",
     "com.github.nscala-time" %% "nscala-time" % "0.8.0"
