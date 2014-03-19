@@ -17,6 +17,9 @@ object Utils {
     def getStringOption(path: String) = if (config.hasPath(path)) Some(config.getString(path)) else None
   }
 
+  /**
+   * Utility methods for Spray client pipelining [[http://spray.io/documentation/1.2.1/spray-client/#usage]]
+   */
   object Pipeline {
     /**
      * Adds an Authorization header with Basic scheme, if credentials are provided (not `None`).
