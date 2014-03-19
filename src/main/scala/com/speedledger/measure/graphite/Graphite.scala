@@ -10,7 +10,13 @@ import Utils._
 import Utils.Pipeline._
 
 case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds) {
-  def cleanPath = path.map(_.replaceAll("[\\(\\)]", "").replaceAll("[ \\.]", "_"))
+  def cleanPath = {
+    val removeParentheses = (in: String) => in.replaceAll("[\\(\\)]", "")
+    val replaceSeparators = (in: String) => in.replaceAll("[ \\.]", "_")
+    val clean = removeParentheses compose replaceSeparators
+
+    path.map(clean)
+  }
 
   def dotPath = cleanPath.mkString(".")
 }
