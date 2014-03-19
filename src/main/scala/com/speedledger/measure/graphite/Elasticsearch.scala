@@ -3,6 +3,7 @@ package com.speedledger.measure.graphite
 import spray.client.pipelining._
 import org.json4s._
 import org.json4s.JsonAST.{JArray, JObject, JValue}
+import org.json4s.native._
 import akka.actor.{ActorLogging, Actor}
 import com.typesafe.config.ConfigFactory
 import scala.util.{Success, Failure}
@@ -36,7 +37,10 @@ class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
   def receive = {
     case Query(indexName, typeName, query) =>
       val originalSender = context.sender
-      pipeline(Get(s"$url/$indexName/$typeName/_search", query)) onComplete {
+      val uri = s"$url/$indexName/$typeName/_search"
+      log.debug("Searching Elasticsearch on '{}' with query {}", uri,  query.map(q => prettyJson(renderJValue(q))))
+
+      pipeline(Get(uri, query)) onComplete {
         case Success(response) =>
           val hits = response \ "hits" \ "hits"
           val objects: List[JObject] = for {

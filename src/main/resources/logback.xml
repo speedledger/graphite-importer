@@ -20,6 +20,9 @@
         </encoder>
     </appender>
 
+    <logger name="akka" level="INFO"/>
+    <logger name="spray" level="INFO"/>
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
