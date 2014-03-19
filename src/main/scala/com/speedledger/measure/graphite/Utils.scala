@@ -9,11 +9,11 @@ import scala.io.Source
 
 object Utils {
 
-  implicit class Base64String(input: String) extends AnyRef {
+  implicit class Base64String(val input: String) extends AnyVal {
     def base64 = ParboiledBase64.rfc2045().encodeToString(input.getBytes, true)
   }
 
-  implicit class RichConfig(config: Config) extends AnyRef {
+  implicit class RichConfig(val config: Config) extends AnyVal {
     def getStringOption(path: String) = if (config.hasPath(path)) Some(config.getString(path)) else None
   }
 
