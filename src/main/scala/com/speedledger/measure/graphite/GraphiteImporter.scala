@@ -43,18 +43,19 @@ class UpdaterActor extends Actor {
 
   val jenkins = context.actorOf(Props[JenkinsActor], "jenkins")
 
-  val timeFile = new File(config.getString("last-updated-time-file"))
-  var lastTime =
+  val timeFile = new File(config.getString("next-query-time-file"))
+  var nextQueryTime =
     Try(FileIO.read(timeFile).toLong).map(new DateTime(_))
       .getOrElse(new DateTime(0))
 
   def receive = {
     case Tick =>
-      if (config.getBoolean("jenkins.enabled"))
-        jenkins ! Update(lastTime)
+      if (config.getBoolean("jenkins.enabled")) {
+        jenkins ! Update(nextQueryTime)
+      }
 
-      lastTime = DateTime.now
-      FileIO.write(lastTime.getMillis.toString, timeFile)
+      nextQueryTime = DateTime.now
+      FileIO.write(nextQueryTime.getMillis.toString, timeFile)
   }
 }
 

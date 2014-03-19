@@ -20,7 +20,7 @@ class JenkinsActor extends Actor with ActorLogging with JsonSupport {
 
   def receive = {
     case Update(lastTime) =>
-      val timeAdjustment = config.getDuration("time-adjustment", TimeUnit.MILLISECONDS)
+      val timeAdjustment = config.getDuration("query-time-adjustment", TimeUnit.MILLISECONDS)
       val fromTime = lastTime - timeAdjustment
       val query =
         ("size" -> config.getLong("query-size")) ~

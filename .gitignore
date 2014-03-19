@@ -9,5 +9,4 @@ test-output/
 *.sw*
 *.log
 /*.conf
-lastUpdatedTime
-
+nextQueryTime
