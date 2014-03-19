@@ -11,7 +11,7 @@ import akka.event.Logging
 /**
  * Application that imports data into Graphite.
  */
-object GraphiteImporter extends App with JsonSupport {
+object GraphiteImporter extends App {
   val config = ConfigFactory.load()
 
   val system = ActorSystem()
@@ -27,8 +27,4 @@ object GraphiteImporter extends App with JsonSupport {
   log.info(s"Update interval is $interval")
 
   system.scheduler.schedule(initialDelay = 1.second, interval, updater, Tick)
-}
-
-trait JsonSupport extends Json4sSupport {
-  implicit def json4sFormats: Formats = DefaultFormats
 }
