@@ -41,7 +41,8 @@ class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
   val url = config.getString("url")
   val credentials = config.getStringOption("authorization-credentials")
 
-  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[JValue])
+  def sendAndReceive = sendReceive
+  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendAndReceive ~> unmarshal[JValue])
 
   def receive = {
     case Query(indexName, typeName, query) =>

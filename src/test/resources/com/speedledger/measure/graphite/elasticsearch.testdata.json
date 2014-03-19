@@ -1,0 +1,34 @@
+{
+    "took": 1,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "failed": 0
+    },
+    "hits": {
+        "total": 100,
+        "max_score": 1.0,
+        "hits": [
+            {
+                "_index": "jenkins",
+                "_type": "build",
+                "_id": "gGE4IFLtRV-QIcFXKgr4nQ",
+                "_score": 1.0,
+                "_source": {
+                    "number": 1337,
+                    "jobName": "Awesome project",
+                    "result": "SUCCESS",
+                    "startTime": 1392731047349,
+                    "duration": 26984,
+                    "environment": {
+                        "TERM": "linux"
+                    },
+                    "systemProperties": {
+                        "os.arch": "amd64"
+                    }
+                }
+            }
+        ]
+    }
+}

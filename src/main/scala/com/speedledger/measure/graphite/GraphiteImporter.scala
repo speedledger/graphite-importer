@@ -1,8 +1,6 @@
 package com.speedledger.measure.graphite
 
 import akka.actor.{Props, ActorSystem}
-import org.json4s._
-import spray.httpx.Json4sSupport
 import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import scala.concurrent.ExecutionContext.Implicits.global

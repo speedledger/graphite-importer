@@ -57,7 +57,8 @@ trait GraphiteHTTP {
   val url = config.getString("url")
   val credentials = config.getStringOption("authorization-credentials")
 
-  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[String])
+  def sendAndReceive = sendReceive
+  val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendAndReceive ~> unmarshal[String])
 
   def sendMeasures(measures: Seq[Measure]): Unit = {
     if (measures.isEmpty) {
