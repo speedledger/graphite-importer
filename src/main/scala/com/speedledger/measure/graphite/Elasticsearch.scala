@@ -12,6 +12,14 @@ import Utils.Pipeline._
 
 object ElasticsearchActor {
 
+  /**
+   * Query that should be sent to Elasticsearch.
+   *
+   * @param indexName name of index.
+   * @param typeName name of type.
+   * @param query optional query on Elasticsearchs query DSL
+   *              [[http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html]]
+   */
   case class Query(indexName: String, typeName: String, query: Option[JValue])
 
   case class Response(objects: Seq[JObject])
@@ -20,6 +28,7 @@ object ElasticsearchActor {
 
 /**
  * Actor that performs queries on Elasticsearch and returns the result to the sender.
+ * Communicates with Elasticsearchs HTTP API.
  */
 class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
 
