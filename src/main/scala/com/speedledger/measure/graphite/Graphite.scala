@@ -9,6 +9,13 @@ import akka.event.LoggingAdapter
 import Utils._
 import Utils.Pipeline._
 
+/**
+ * Measurement to be sent to Graphite.
+ *
+ * @param path the path that the measurement should be recorded on.
+ * @param value the value that should be recorded.
+ * @param time at which time the measurement was done, in milliseconds since epoch.
+ */
 case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds) {
   def cleanPath = {
     val removeParentheses = (in: String) => in.replaceAll("[\\(\\)]", "")
@@ -37,6 +44,9 @@ class GraphiteActor extends Actor with ActorLogging with GraphiteHTTP {
 
 /**
  * HTTP implementation to communicate with Graphite.
+ *
+ * Sends data for each measure on format "path value time", several measures are separated by a newline.
+ * 'path' is a dot delimited path, 'value' is an integer or decimal and 'time' is number of seconds sine epoch.
  */
 trait GraphiteHTTP {
   self: Actor =>
