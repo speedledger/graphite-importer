@@ -59,21 +59,25 @@ trait GraphiteHTTP {
 
   val pipeline = addOptionalBasicAuthorization(credentials) ~> (sendReceive ~> unmarshal[String])
 
-  def prepareData(measures: Seq[Measure]) = {
-    measures map {
-      case m@Measure(_, value, time) =>
-        val epochSeconds = time / 1000
-        s"${m.dotPath} $value $epochSeconds"
-    } mkString "\n"
+  def sendMeasures(measures: Seq[Measure]): Unit = {
+    if (measures.isEmpty) {
+      log.info("No data to send to Graphite")
+    } else {
+      val data = prepareData(measures)
+      log.debug("Measurement data: {}", data)
+      pipeline(Post(url, data)) onComplete {
+        case Failure(ex) => log.error(ex, "Error when sending data to Graphite")
+        case Success("") => log.info(s"Sent ${measures.size} measurements")
+        case Success(response) => log.warning("Got unexpected response from Graphite: {}", response)
+      }
+    }
   }
 
-  def sendMeasures(measures: Seq[Measure]) = {
-    val data = prepareData(measures)
-    log.debug("Measurement data: {}", data)
-    pipeline(Post(url, data)) onComplete {
-      case Failure(ex) => log.error(ex, "Error when sending data to Graphite")
-      case Success("") => log.info(s"Sent ${measures.size} measurements")
-      case Success(response) => log.warning("Got unexpected response from Graphite: {}", response)
-    }
+  def prepareData(measures: Seq[Measure]) = {
+    measures map {
+      measure =>
+        val epochSeconds = measure.time / 1000
+        s"${measure.dotPath} ${measure.value} $epochSeconds"
+    } mkString "\n"
   }
 }
