@@ -1,6 +1,6 @@
 package com.speedledger.measure.graphite
 
-import org.scalatest.{Matchers, FunSuite}
+import org.scalatest.{FreeSpec, WordSpec, Matchers, FunSuite}
 import akka.actor.{Props, ActorSystem}
 import akka.testkit.TestActorRef
 import scala.concurrent.{Promise, Future}
@@ -10,30 +10,48 @@ import org.scalatest.concurrent.ScalaFutures
 /**
  * Tests for [[com.speedledger.measure.graphite.GraphiteActor]].
  */
-class GraphiteActorTest extends FunSuite with Matchers with ScalaFutures {
+class GraphiteActorTest extends FreeSpec with Matchers with ScalaFutures {
   implicit val system = ActorSystem("graphite-actor-test")
 
-  test("Single measure are sent correctly") {
-    val request = Promise[HttpRequest]()
+  val FirstMeasure = Measure(Seq("a", "b"), 123, 123456789000L)
+  val FirstMeasureAsString = "a.b 123 123456789"
+  val SecondMeasure = Measure(Seq("a", "c"), 987, 987654321000L)
+  val SecondMeasureAsString = "a.c 987 987654321"
 
-    val graphite = TestActorRef(Props(new GraphiteActorMock(request)))
-    graphite ! Measure(Seq("a", "b"), 123, 123456789000L)
+  val BothMeasures = Measures(Seq(FirstMeasure, SecondMeasure))
+  val BothMeasuresAsString = s"$FirstMeasureAsString\n$SecondMeasureAsString"
 
-    val requestBody = request.future.futureValue.entity.asString
-    requestBody should be === "a.b 123 123456789"
+  "Measures can be sent" - {
+    def fixture = new {
+      val request = Promise[HttpRequest]()
+      val graphite = TestActorRef(Props(new GraphiteActorMock(request)))
+      def requestBody = request.future.futureValue.entity.asString
+    }
+
+    "Single measure" - {
+      val f = fixture
+      f.graphite ! FirstMeasure
+      f.requestBody shouldEqual FirstMeasureAsString
+    }
+
+    "Multiple measures" - {
+      val f = fixture
+      f.graphite ! BothMeasures
+      f.requestBody shouldEqual BothMeasuresAsString
+    }
   }
 
-  test("Multiple measures are sent correctly") {
-    val request = Promise[HttpRequest]()
+  "Measures can be converted to string format" - {
+    val graphiteRef = TestActorRef[GraphiteActor]
+    val graphite = graphiteRef.underlyingActor
 
-    val graphite = TestActorRef(Props(new GraphiteActorMock(request)))
-    val measures = Measures(Seq(
-      Measure(Seq("a", "b"), 123, 123456789000L),
-      Measure(Seq("a", "c"), 987, 987654321000L)))
-    graphite ! measures
+    "Single measure" - {
+      graphite.prepareData(FirstMeasure) shouldEqual FirstMeasureAsString
+    }
 
-    val requestEntity = request.future.futureValue.entity.asString
-    requestEntity should be === "a.b 123 123456789\na.c 987 987654321"
+    "Multiple measures" - {
+      graphite.prepareData(BothMeasures.measures) shouldEqual BothMeasuresAsString
+    }
   }
 }
 
