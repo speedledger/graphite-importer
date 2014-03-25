@@ -29,7 +29,7 @@ with ImplicitSender with FreeSpecLike with Matchers with ScalaFutures with Insid
     val httpResponse = ElasticsearchActorTest.httpResponseWithTestData
 
     val elasticsearch = TestActorRef(Props(new ElasticsearchActorMock(httpRequest, httpResponse)))
-    within(200 millis) {
+    within(1 second) {
       val query = JObject("size" -> JInt(1))
       elasticsearch ! Query("index", "type", Some(query))
 
