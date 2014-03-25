@@ -19,13 +19,15 @@ import Utils.Pipeline._
 case class Measure(path: Seq[String], value: Long, time: EpochMilliseconds) {
   def cleanPath = {
     val removeParentheses = (in: String) => in.replaceAll("[\\(\\)]", "")
-    val replaceSeparators = (in: String) => in.replaceAll("[ \\.]", "_")
+    val replaceSeparators = (in: String) => in.replaceAll("[\\s\\./]", "_")
     val clean = removeParentheses compose replaceSeparators
 
     path.map(clean)
   }
 
   def dotPath = cleanPath.mkString(".")
+
+  def timeInSeconds = time / 1000
 }
 
 case class Measures(measures: Seq[Measure])
@@ -74,11 +76,7 @@ trait GraphiteHTTP {
     }
   }
 
-  def prepareData(measures: Seq[Measure]) = {
-    measures map {
-      measure =>
-        val epochSeconds = measure.time / 1000
-        s"${measure.dotPath} ${measure.value} $epochSeconds"
-    } mkString "\n"
-  }
+  def prepareData(measures: Seq[Measure]): String = measures.map(prepareData).mkString("\n")
+
+  def prepareData(measure: Measure): String = s"${measure.dotPath} ${measure.value} ${measure.timeInSeconds}"
 }
