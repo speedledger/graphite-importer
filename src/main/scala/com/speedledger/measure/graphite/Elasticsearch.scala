@@ -48,22 +48,24 @@ class ElasticsearchActor extends Actor with ActorLogging with JsonSupport {
     case Query(indexName, typeName, query) =>
       val originalSender = context.sender
       val uri = s"$url/$indexName/$typeName/_search"
-      log.debug("Searching Elasticsearch on '{}' with query {}", uri,  query.map(q => prettyJson(renderJValue(q))))
+      log.debug("Searching Elasticsearch on '{}' with query {}", uri, query.map(q => prettyJson(renderJValue(q))))
 
       pipeline(Get(uri, query)) onComplete {
         case Success(response) =>
-          val hits = response \ "hits" \ "hits"
-          val objects: List[JObject] = for {
-            JArray(list) <- hits
-            JObject(hit) <- list
-            JField("_source", source: JObject) <- hit
-          } yield source
-
+          val objects = extractSourceObjects(response)
           log.info(s"Read ${objects.length} objects from $indexName/$typeName")
-
           originalSender ! Response(objects)
         case Failure(ex) =>
           log.error(ex, "Error when getting data from elasticsearch")
       }
+  }
+
+  def extractSourceObjects(response: JsonAST.JValue): List[JObject] = {
+    val hits = response \ "hits" \ "hits"
+    for {
+      JArray(list) <- hits
+      JObject(hit) <- list
+      JField("_source", source: JObject) <- hit
+    } yield source
   }
 }
